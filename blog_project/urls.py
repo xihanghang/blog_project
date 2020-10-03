@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-
+from first_app import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^send/sms',views.send_sms,name='send_sms')
 ]

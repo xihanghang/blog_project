@@ -118,8 +118,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
+####sms短信验证####
+TENCENT_APPID=1400433981
+TENCENT_APPKEY="5d560afd996fa3132ebb9f9f7bf14f42"
+TENCENT_SMS_TEMPLATE={
+    'signin':"惠航航的boke"
+}
 try:
     from .local_settings import *
 except ImportError:
