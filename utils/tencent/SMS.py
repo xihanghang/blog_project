@@ -15,7 +15,8 @@ def send_sms_single(phone_num, template_id, template_param_list):
     """
     appid = settings.TENCENT_APPID  # 自己应用ID
     appkey = settings.TENCENT_APPKEY  # 自己应用Key
-    sms_sign = settings.TENCENT_SMS_SIGN  # 自己腾讯云创建签名时填写的签名内容（使用公众号的话这个值一般是公众号全称或简称）
+    # sms_sign = settings.TENCENT_SMS_TEMPLATE# 自己腾讯云创建签名时填写的签名内容（使用公众号的话这个值一般是公众号全称或简称）
+    sms_sign='惠航航的boke'
     sender = SmsSingleSender(appid, appkey)
     try:
         response = sender.send_with_param(86, phone_num, template_id, template_param_list, sign=sms_sign)

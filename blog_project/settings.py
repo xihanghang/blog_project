@@ -125,7 +125,7 @@ STATIC_ROOT=os.path.join(BASE_DIR,'static')
 TENCENT_APPID=1400433981
 TENCENT_APPKEY="5d560afd996fa3132ebb9f9f7bf14f42"
 TENCENT_SMS_TEMPLATE={
-    'signin':"惠航航的boke"
+    'sign_up':737421
 }
 try:
     from .local_settings import *

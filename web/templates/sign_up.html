@@ -3,6 +3,13 @@
 {% block title %}用户注册{% endblock %}
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <style>
+        .error-msg{
+            color: red;
+            position: absolute;
+            font-size: 10px;
+        }
+    </style>
 {% endblock %}
 {% block content %}
     <div class="account">
@@ -16,7 +23,7 @@
                         <div class="row">
                             <div class="col-xs-7">
                                 {{ foo }}
-                                <span class="error-msg">{{ foo.errors.0 }}</span>
+                                <span class="error-msg"></span>
                             </div>
                             <div class="col-xs-5">
                                 <input id="smsBtn" type="button" class="btn btn-default" value="点击获取验证码">
@@ -27,7 +34,7 @@
                     <div class="form-group">
                         <label for="{{ foo.id_for_label }}">{{ foo.label }}</label>
                         {{ foo }}
-                        <span class="error-msg">{{ foo.errors.0 }}</span>
+                        <span class="error-msg"></span>
                     </div>
                 {% endif %}
             {% endfor %}
@@ -39,4 +46,71 @@
         </form>
     </div>
 {% endblock %}
-{% block js %}{% endblock %}
+{% block js %}
+    <script>
+        //页面加载完成自动执行函数
+    $(function () {
+        bindClickBtnSms()
+        bindClickSubmit()
+    });
+    function bindClickSubmit() {
+        $('#submit').click(function () {
+            $.ajax({
+                url:'{% url 'sign_up' %}',
+                type:'POST',
+                data:$('#form').serialize(),//获取数据
+                dataType:'JSON',
+                success:function (res) {
+                    console.log(res);
+                }
+        })
+        })
+
+
+
+    }
+    function bindClickBtnSms() {
+        /*
+        点击获取验证码按钮绑定事件
+        找到输入框id，通过id获取手机号
+         */
+        $('#smsBtn').click(function () {
+
+            $('.error-msg').empty();
+
+            var mobilePhone=$('#id_mobile_phone').val()
+            //发送ajax请求，将手机号发送过去
+            $.ajax({
+                url:'{% url 'send_sms' %}',
+                type:'GET',
+                data:{mobile_phone:mobilePhone,tpl:'sign_up' },
+                datatype:'JSON',//将服务端返回的数据反序列化为字典
+                success: function (res) {
+                    if(res.status) {
+                        sendSmsRemind();
+                    }else{
+                        //错误信息
+                        $.each(res.error,function(key,value) {
+                            $('#id_'+key).next().text(value[0]);
+                        })
+                    }
+                }
+            })
+        })
+    }
+    function sendSmsRemind() {
+        var $smsBtn=$('#smsBtn');
+        $smsBtn.prop('disabled',true);
+        var time=60;
+        var remind = setInterval(function(){
+            $smsBtn.val(time+'秒后重新发送');
+            time=time-1;
+            if (time<1){
+                clearInterval(remind);
+                $smsBtn.val('点击获取验证码').prop('disabled',false);
+            }
+
+            },1000)
+        }
+    </script>
+{% endblock %}

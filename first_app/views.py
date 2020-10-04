@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from web.views.SMS import send_sms_single
+from utils.tencent.SMS import send_sms_single
 from django.http import HttpResponse
 import random
 from django.conf import settings
