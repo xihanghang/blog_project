@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'first_app.apps.FirstAppConfig',
+    'web.apps.WebConfig'
 ]
 
 MIDDLEWARE = [
@@ -118,6 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT=os.path.join(BASE_DIR,'static')
 ####sms短信验证####
 TENCENT_APPID=1400433981
 TENCENT_APPKEY="5d560afd996fa3132ebb9f9f7bf14f42"
