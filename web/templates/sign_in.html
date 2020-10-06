@@ -1,0 +1,59 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+{% block title %}用户登录{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <style>
+        .error-msg{
+            color: red;
+            position: absolute;
+            font-size: 10px;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="account">
+        <div class="title">用户登录</div>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for foo in form %}
+                {% if foo.name == 'code' %}
+                    <div class="form-group">
+                        <label for="{{ foo.id_for_label }}">{{ foo.label }}</label>
+                        <div class="row">
+                            <div class="col-xs-7">
+                                {{ foo }}
+                                <span class="error-msg">{{ foo.errors.0 }}</span>
+                            </div>
+                            <div class="col-xs-5">
+                                <img src="{% url 'image_code' %}" alt="验证码加载失败" id="imagecode" title="点击更换图片">
+                            </div>
+                        </div>
+                    </div>
+                 {% else %}
+                    <div class="form-group">
+                        <label for="{{ foo.id_for_label }}">{{ foo.label }}</label>
+                        {{ foo }}
+                        <span class="error-msg">{{ foo.errors.0 }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+                <div class="row">
+                    <div class="col-xs-3">
+                        <input  type="submit" class="btn btn-primary" value="登 录">
+                    </div>
+                </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(function () {
+            $('#imagecode').click(function () {
+                var oldcode=$(this).attr('src');
+                $(this).attr('src',oldcode+'?');
+            })
+        })
+    </script>
+{% endblock %}

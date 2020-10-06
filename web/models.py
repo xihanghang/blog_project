@@ -5,4 +5,4 @@ class UserInfo(models.Model):
     username=models.CharField(max_length=32)
     email=models.EmailField(max_length=32)
     mobile_phone=models.CharField(max_length=15)
-    password=models.CharField(max_length=16)
+    password=models.CharField(max_length=32)
