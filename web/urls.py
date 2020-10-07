@@ -10,5 +10,6 @@ urlpatterns=[
     url(r'^image/code',account.image_code,name='image_code'),
     url(r'^index',home.index,name='index'),
     url(r'^signout/',account.signout,name='signout'),
+    url(r'^control_center',home.control_center,name='control_center')
 
 ]
