@@ -53,7 +53,7 @@ def sign_in_sms(request):
         #将用户信息放入session中
         user_object=models.UserInfo.objects.filter(mobile_phone=mobile_phone).first()
         request.session['user_id']=user_object.id
-        request.session['user_name']=user_object.username
+        request.session.set_expiry(60*60*24*14)
         return JsonResponse({'status':True,'data':'/index/'})
     return JsonResponse({'status': False, 'errors': form.errors})
     # else:
@@ -75,6 +75,8 @@ def sign_in(request):
         from django.db.models import Q
         user_object=models.UserInfo.objects.filter(Q(email=username)|Q(mobile_phone=username)).filter(password=password).first()
         if user_object:
+            request.session['user_id']=user_object.id
+            request.session.set_expiry(60*60*24*14)
             return redirect('index')
         form.add_error('username','账号信息或密码错误')
     return render(request,'sign_in.html',{'form':form})
@@ -91,3 +93,6 @@ def image_code(request):
     image_object.save(stream, 'png')
     return HttpResponse(stream.getvalue())
 
+def signout(request):
+    request.session.flush()
+    return redirect('index')

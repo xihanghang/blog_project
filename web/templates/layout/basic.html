@@ -20,7 +20,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="#">blog</a>
+      <a class="navbar-brand" href="{% url 'index' %}">blog</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -43,17 +43,21 @@
 {#        </li>#}
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">Link</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="#">Separated link</a></li>
-          </ul>
-        </li>
+          {% if request.blog %}
+              <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ request.blog.username }}<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">个人中心</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="{% url 'signout' %}">退出登录</a></li>
+              </ul>
+              </li>
+          {% else %}
+            <Li><a href="{% url 'sign_in' %}">登录</a></Li>
+            <li><a href="{% url 'sign_up' %}">注册</a></li>
+          {% endif %}
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
