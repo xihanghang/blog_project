@@ -129,6 +129,15 @@ TENCENT_SMS_TEMPLATE={
     'sign_up':737421,
     'sign_in_sms':737421
 }
+
+WHITE_REGEX_URL_LIST=[
+    '/web/sign_up/',
+    '/web/send_sms/',
+    '/web/sign_in/',
+    '/web/image/code/',
+    '/web/index/',
+    '/web/sign_in/sms/'
+]
 try:
     from .local_settings import *
 except ImportError:

@@ -7,7 +7,8 @@ from django.http import HttpResponse
 from web.forms.account import  SendSmsForm
 from django.http import JsonResponse
 from web import models
-
+import uuid
+import datetime
 # Create your views here.
 def send_sms(request):
     # """发送短信"""
@@ -39,7 +40,16 @@ def sign_up(request):
     form=SignUpModelForm(data=request.POST)
     if form.is_valid():
         #验证通过并且密码是密文
-        form.save()
+        instance=form.save()
+        #为用户设置默认交易记录
+        models.Transaction.objects.create(
+            status=2,
+            order=str(uuid.uuid4()),
+            user=instance,
+            count=0,
+            price=0,
+            start_datetime=datetime.datetime.now()
+        )
         return JsonResponse({'status':True,'data':'/web/sign_in/sms'})
     return JsonResponse({'status':False,'errors':form.errors})
 def sign_in_sms(request):

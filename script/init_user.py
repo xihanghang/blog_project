@@ -1,12 +1,5 @@
 
-import django
-import os
-import sys
-base_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append((base_dir))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE","blog_project")
-django.setup()
-
+import base
 
 from web import models
 #往数据库添加数据，连接数据库，操作，关闭连接
