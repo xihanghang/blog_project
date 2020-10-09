@@ -58,9 +58,9 @@ class Project(models.Model):
         (6,'#7461c2'),
         (7,'#20bfa3')
     )
-    name=models.CharField(verbose_name='项目名',max_length=32)
-    color=models.SmallIntegerField(verbose_name='颜色',choices=COLOR_CHOICES,default=1)
-    desc=models.CharField(verbose_name='项目描述',max_length=255,null=True,blank=True)
+    name=models.CharField(verbose_name='博客名',max_length=32)
+    color=models.SmallIntegerField(verbose_name='风格',choices=COLOR_CHOICES,default=1)
+    desc=models.CharField(verbose_name='博客概述',max_length=255,null=True,blank=True)
     user_space=models.IntegerField(verbose_name='项目已使用空间',default=0)
     star=models.BooleanField(verbose_name='星标',default=False)
 
