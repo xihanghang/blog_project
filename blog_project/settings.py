@@ -136,7 +136,8 @@ WHITE_REGEX_URL_LIST=[
     '/web/sign_in/',
     '/web/image/code/',
     '/web/index/',
-    '/web/sign_in/sms/'
+    '/web/sign_in/sms/',
+
 ]
 try:
     from .local_settings import *

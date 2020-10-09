@@ -42,15 +42,17 @@ def sign_up(request):
         #验证通过并且密码是密文
         instance=form.save()
         #为用户设置默认交易记录
-        models.Transaction.objects.create(
-            status=2,
-            order=str(uuid.uuid4()),
-            user=instance,
-            count=0,
-            price=0,
-            start_datetime=datetime.datetime.now()
-        )
-        return JsonResponse({'status':True,'data':'/web/sign_in/sms'})
+        policy_object=models.PricePolicy.objects.filter(category=1,title='个人免费版').first()
+        # models.Transaction.objects.create(
+        #     status=2,
+        #     order=str(uuid.uuid4()),
+        #     user=instance,
+        #     price_policy=policy_object,
+        #     count=0,
+        #     price=0,
+        #     start_datetime=datetime.datetime.now()
+        # )
+        return JsonResponse({'status':True,'data':'/web/sign_in/'})
     return JsonResponse({'status':False,'errors':form.errors})
 def sign_in_sms(request):
     if request.method=='GET':

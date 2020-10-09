@@ -7,6 +7,8 @@ class UserInfo(models.Model):
     mobile_phone=models.CharField(max_length=15)
     password=models.CharField(max_length=32)
 
+    # price_policy=models.ForeignKey(verbose_name='价格策略',to='PricePolicy',null=True,blank=True)(可以提升性能)
+
 class PricePolicy(models.Model):
     """价格策略"""
     category_choices=(
@@ -34,8 +36,8 @@ class Transaction(models.Model):
 
     status=models.SmallIntegerField(verbose_name='支付状态',choices=status_choice)
     order=models.CharField(verbose_name='订单号',max_length=64,unique=True)#唯一索引
-    user=models.ForeignKey(verbose_name='用户',to='PricePolicy')
-
+    user=models.ForeignKey(verbose_name='用户',to='UserInfo')
+    price_policy=models.ForeignKey(verbose_name='价格策略',to='PricePolicy')
     count=models.IntegerField(verbose_name='数量（年）',help_text='0表示无限期')
 
     price=models.IntegerField(verbose_name='实际支付价格')
