@@ -9,6 +9,7 @@ class blog:
     def __init__(self):
         self.user=None
         self.price_policy=None
+        self.project=None
 class AuthMiddleware(MiddlewareMixin):
     def process_request(self,request):
         """如果用户已登录，则在request中赋值"""
@@ -52,3 +53,22 @@ class AuthMiddleware(MiddlewareMixin):
                 request.blog.price_policy=models.PricePolicy.objects.filter(category=1,title='个人免费版').first()
             else:
                 request.price_policy=_object.price_policy
+
+    def process_view(self,request,view,args,kwargs):
+        #判断url是否以manage开头·
+        if not request.path_info.startswith('/web/manage/'):
+            print('****')
+            return
+        project_id=kwargs.get('project_id')
+        #判断是否是我创建的
+        project_object=models.Project.objects.filter(creator=request.blog.user,id=project_id).first()
+        if project_object:
+            request.blog.project=project_object
+            return
+        #判断是否是我参与的
+        project_user_object=models.ProjectUser.objects.filter(user=request.blog.user,project_id=project_id).first()
+        if project_user_object:
+            request.blog.project = project_user_object.project
+            return
+
+        return redirect('project_list')

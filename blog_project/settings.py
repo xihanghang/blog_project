@@ -130,6 +130,9 @@ TENCENT_SMS_TEMPLATE={
     'sign_in_sms':737421
 }
 
+TENCENT_SECRET_ID = 'cos Id'      # 替换为用户的 secretId
+TENCENT_SECRET_KEY = 'cos Key'      # 替换为用户的 secretKey
+
 WHITE_REGEX_URL_LIST=[
     '/web/sign_up/',
     '/web/send_sms/',

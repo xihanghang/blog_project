@@ -70,6 +70,8 @@ class Project(models.Model):
     join_count=models.SmallIntegerField(verbose_name='参与人数',default=1)
     creator=models.ForeignKey(verbose_name='创建者',to='UserInfo')
     create_datetime=models.DateTimeField(verbose_name='创建时间',auto_now_add=True)
+    bucket=models.CharField(verbose_name='cos桶',max_length=128)
+    region=models.CharField(verbose_name='cos区域',max_length=32)
 
 class ProjectUser(models.Model):
     """项目参与者"""
@@ -81,3 +83,32 @@ class ProjectUser(models.Model):
 
 
     create_datetime=models.DateTimeField(verbose_name='加入时间',auto_now_add=True)
+
+
+class Wiki(models.Model):
+    project=models.ForeignKey(verbose_name='项目',to='Project')
+    title=models.CharField(verbose_name='标题',max_length=32)
+    content=models.TextField(verbose_name='内容')
+    depth=models.IntegerField(verbose_name='深度',default=1)
+    #子关联
+    parent=models.ForeignKey(verbose_name='父文章',to='self',null=True,blank=True,related_name='children')
+
+    def __str__(self):
+        return self.title
+
+class FileRepository(models.Model):
+    project=models.ForeignKey(verbose_name='项目',to='Project')
+    file_type_choice=(
+        (1,'文件'),
+        (2,'文件夹')
+    )
+    file_type=models.SmallIntegerField(verbose_name='类型',choices=file_type_choice)
+    name=models.CharField(verbose_name='文件夹名称',max_length=32,help_text="w文件/文件夹")
+    key=models.CharField(verbose_name="文件储存在cos中的KEY",max_length=128,null=True,blank=True)
+
+    file_size=models.IntegerField(verbose_name='文件大小',null=True,blank=True)
+    file_path=models.CharField(verbose_name='文件路径',max_length=255,null=True,blank=True)
+    parent=models.ForeignKey(verbose_name='父级目录',to='self',related_name='child',null=True,blank=True)
+
+    update_user=models.ForeignKey(verbose_name='最近更新者',to='UserInfo')
+    update_datetime=models.DateTimeField(verbose_name='更新时间',auto_now=True)
