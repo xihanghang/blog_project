@@ -11,10 +11,5 @@ def issues(request,project_id):
 def statistic(request,project_id):
     return render(request,'statistic.html')
 
-def file(request,project_id):
-    return render(request,'file.html')
-
-
-
 def setting(request,project_id):
     return render(request,'setting.html')
