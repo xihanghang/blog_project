@@ -31,6 +31,7 @@ urlpatterns=[
             url(r'^wiki/uoload/$',wiki.wiki_upload,name='wiki_upload'),
 
             url(r'^file/$',file.file,name='file'),
+            url(r'^file_delete/$',file.file_delete,name='file_delete'),
             # url(r'^wiki/detail/$',wiki.wiki_detail,name='wiki_detail'),
             url(r'^setting/$',manage.setting,name='setting'),
         ],None,None)),

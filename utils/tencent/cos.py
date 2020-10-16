@@ -29,3 +29,28 @@ def upload_file(bucket,region,file_object,key):
     )
     print(response['ETag'])
     return "https://{}.cos.{}.myqcloud.com/{}".format(bucket,region,key)
+
+def delete_file(bucket,region,key):
+    config = CosConfig(Region=region, SecretId=settings.TENCENT_SECRET_ID, SecretKey=settings.TENCENT_SECRET_KEY)
+    # # 2. 获取客户端对象
+    client = CosS3Client(config)
+    # 参照下文的描述。或者参照 Demo 程序，详见 https://github.com/tencentyun/cos-python-sdk-v5/blob/master/qcloud_cos/demo.py
+
+    client.delete_object(
+        Bucket=bucket,
+        Key=key
+    )
+
+def delete_file_list(bucket,region,key_list):
+    config = CosConfig(Region=region, SecretId=settings.TENCENT_SECRET_ID, SecretKey=settings.TENCENT_SECRET_KEY)
+    # # 2. 获取客户端对象
+    client = CosS3Client(config)
+    # 参照下文的描述。或者参照 Demo 程序，详见 https://github.com/tencentyun/cos-python-sdk-v5/blob/master/qcloud_cos/demo.py
+    objects = {
+        "Quiet": "true",
+        "Object": key_list
+    }
+    client.delete_objects(
+        Bucket=bucket,
+        Delete=objects
+    )
