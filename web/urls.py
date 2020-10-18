@@ -7,6 +7,7 @@ from django.conf.urls import include
 from web.views import manage
 from web.views import wiki
 from web.views import file
+from web.views import setting
 urlpatterns=[
             url(r'^sign_up/$',account.sign_up,name='sign_up'),
             url(r'^send_sms/$',account.send_sms,name='send_sms'),
@@ -32,7 +33,11 @@ urlpatterns=[
 
             url(r'^file/$',file.file,name='file'),
             url(r'^file_delete/$',file.file_delete,name='file_delete'),
+            url(r'^file/post/$',file.file_post,name='file_post'),
+            url(r'^file/download/(?P<file_id>\d+)$',file.download,name='file_download'),
+            url(r'^cos/credential/$',file.cos_credential,name='cos_credential'),
             # url(r'^wiki/detail/$',wiki.wiki_detail,name='wiki_detail'),
-            url(r'^setting/$',manage.setting,name='setting'),
+            url(r'^setting/$',setting.setting,name='setting'),
+            url(r'^setting/delete$',setting.delete,name='setting_delete'),
         ],None,None)),
 ]

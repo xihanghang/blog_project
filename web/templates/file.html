@@ -1,5 +1,5 @@
 {% extends 'layout/manage.html' %}
-
+{% load static %}
 {% block css %}
     <style>
         .panel-default .panel-heading{
@@ -25,6 +25,16 @@
             width: 76px;
             left: -2px;
             overflow: hidden;
+        }
+        .upload-progress {
+            position: fixed;
+            right: 2px;
+            bottom: 2px;
+            width: 400px;
+        }
+
+        .upload-progress .progress-error {
+            color: red;
         }
     </style>
 {% endblock %}
@@ -68,12 +78,13 @@
                 <th>操作</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="rowList">
                 {% for item in file_object_list %}
                     <tr>
-                        <th>
+                        <td>
                             {% if item.file_type == 1 %}
                                 <i class="fa fa-file" aria-hidden="true"></i>
+                                {{ item.name }}
                             {% else %}
                                 <a href={% url 'file' project_id=request.blog.project.id %}?folder={{ item.id }}>
                                     <i class="fa fa-folder" aria-hidden="true"></i>
@@ -81,8 +92,8 @@
                                 </a>
                             {% endif %}
 {#                            {{ item.name }}#}
-                        </th>
-                        <th>
+                        </td>
+                        <td>
                             {% if item.file_type == 1 %}
                                 {{ item.file_size }}
                             {% else %}
@@ -95,10 +106,15 @@
                             <a class="btn btn-dafault btn-xs"
                                data-toggle="modal"
                                data-target="#addModal"
-                               data-whatever="修改文件夹"
                                data-name="{{ item.name }}"
-                               data-fid="{{ item.id }}">
+                               data-fid="{{ item.id }}"
+                               data-whatever="修改文件夹">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                            </a>
+                        {% else %}
+                            <a class="btn btn-default btn-xs download"
+                               href="{% url 'file_download' project_id=request.blog.project.id file_id=item.id %}">
+                                <i class="fa fa-cloud-download" aria-hidden="true"></i>
                             </a>
                         {% endif %}
                         <a class="btn btn-danger btn-xs"
@@ -161,14 +177,73 @@
             </div>
         </div>
     </div>
+
+    <div id="uploadProgress" class="upload-progress hide">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <i class="fa fa-cloud-upload" aria-hidden="true"></i> 上传进度
+            </div>
+
+            <table class="table">
+                <tbody id="progressList">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="hide">
+        <table id="progressTemplate">
+            <tr>
+                <td>
+                    <div class="name"></div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                             aria-valuenow="0"
+                             aria-valuemin="0"
+                             aria-valuemax="100" style="width: 0%;">
+                            0%
+                        </div>
+                    </div>
+                    <div class="progress-error"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="hide">
+        <table id="rowTpl">
+            <tr>
+                <td>
+                    <i class="fa fa-file" aria-hidden="true"></i>
+                    <span class="name"></span>
+                </td>
+                <td class="file_size"></td>
+                <td class="username"></td>
+                <td class="datetime"></td>
+                <td>
+
+                    <a class="btn btn-default btn-xs download">
+                        <i class="fa fa-cloud-download" aria-hidden="true"></i>
+                    </a>
+
+                    <a class="btn btn-danger btn-xs delete" data-toggle="modal" data-target="#alertModal">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
 {% endblock %}
 
 
 {% block js %}
+    <script src="{% static 'js/cos-js-sdk-v5.min.js' %}"></script>
     <script>
-
+        var FILE_POST='{% url 'file_post' project_id=request.blog.project.id %}';
         var FOLDER_URL='{% url 'file' project_id=request.blog.project.id %}';
         var FILE_DELETE_URL='{% url 'file_delete' project_id=request.blog.project.id %}';
+        var COS_REDENTIAL="{% url 'cos_credential' project_id=request.blog.project.id %}"
+        var CURRENT_FOLDER_ID = "{{ folder_object.id }}";
         $(function () {
             initAddModal();
             bindModelSubmit();
@@ -176,15 +251,87 @@
             bindUploadFile();
         })
         function bindUploadFile() {
+            //获取临时凭证
             $('#uploadFile').change(function () {
-                var filelist=$(this)[0].files;
-                $.each(filelist,function (index,fileobject) {
-                    console.log(fileobject.name);
+                $('#progressList').empty();
+                var fileList = $(this)[0].files;
+                // 获取本次要上传的每个文件 名称&大小
+                var checkFileList = [];
+                $.each(fileList, function (index, fileObject) {
+                    checkFileList.push({'name': fileObject.name, 'size': fileObject.size})
+                });
+
+                // 把这些数据发送到django后台：Django后台进行容量的校验，如果么有问题则返回临时凭证；否则返回错误信息；
+                var cos_credential = new COS({
+                    getAuthorization: function (options, callback) {
+                        $.post(COS_REDENTIAL, JSON.stringify(checkFileList), function (res) {
+                            if (res.status) {
+                                var credentials = res.data && res.data.credentials;
+                                callback({
+                                    TmpSecretId: credentials.tmpSecretId,
+                                    TmpSecretKey: credentials.tmpSecretKey,
+                                    XCosSecurityToken: credentials.sessionToken,
+                                    StartTime: res.data.startTime,
+                                    ExpiredTime: res.data.expiredTime
+                                });
+                                $('#uploadProgress').removeClass('hide');
+                            } else {
+                                alert(res.error);
+                            }
+                        });
+                    }
+                });
+                $.each(fileList, function (index, fileObject) {
+                    var fileName = fileObject.name;
+                    var fileSize = fileObject.size;
+                    var key = (new Date()).getTime() + "_" + fileName;
+                    var tr = $('#progressTemplate').find('tr').clone();
+                    tr.find('.name').text(fileName);
+                    $('#progressList').append(tr);
+                    // 上传文件（异步）
+                    cos_credential.putObject({
+                        Bucket: '{{ request.blog.project.bucket }}', /* 必须 */
+                        Region: '{{ request.blog.project.region }}', /* 存储桶所在地域，必须字段 */
+                        Key: key, /* 必须 */
+                        Body: fileObject, // 上传文件对象
+                        onProgress: function (progressData) {
+                            var percent = progressData.percent * 100 + '%';
+                            tr.find('.progress-bar').text(percent);
+                            tr.find('.progress-bar').css('width', percent);
+                        }
+                    }, function (err, data) {
+                        if (data && data.statusCode === 200) {
+                            // 上传成功，将本次上传的文件提交到后台并写入数据
+                            // 当前文件上传成功
+                            $.post(FILE_POST, {
+                                name: fileName,
+                                key: key,
+                                file_size: fileSize,
+                                parent: CURRENT_FOLDER_ID,
+                                etag: data.ETag,
+                                file_path: data.Location
+                            }, function (res) {
+                                // 在数据库中写入成功，将已添加的数据在页面上动态展示。
+                                var newTr = $('#rowTpl').find('tr').clone();
+                                newTr.find('.name').text(res.data.name);
+                                newTr.find('.file_size').text(res.data.file_size);
+                                newTr.find('.username').text(res.data.username);
+                                newTr.find('.datetime').text(res.data.datetime);
+                                newTr.find('.delete').attr('data-fid', res.data.id);
+                                newTr.find('.download').attr('href', res.data.download_url);
+                                $('#rowList').append(newTr);
+
+                                // 自己的进度删除
+                                tr.remove();
+                            })
+
+                        } else {
+                            tr.find('.progress-error').text('上传失败');
+                        }
+                    });
                 })
-            })
-
+            });
         }
-
         function bindDeleteSubmit() {
             $('#btnDelete').click(function () {
                 $.ajax({
@@ -193,7 +340,7 @@
                     data:{fid:$(this).attr('fid')},
                     success:function (res) {
                        if(res.status){
-                           location.href=location.href
+                           location.href = location.href;
                        }
                     }
                 })

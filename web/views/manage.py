@@ -10,6 +10,3 @@ def issues(request,project_id):
 
 def statistic(request,project_id):
     return render(request,'statistic.html')
-
-def setting(request,project_id):
-    return render(request,'setting.html')
