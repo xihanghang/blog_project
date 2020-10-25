@@ -44,7 +44,12 @@ def project_list(request):
         #验证通过 用户仅提供博客名，风格，描述，还有一些字段尚未给出
         form.instance.creator=request.blog.user
         #创建项目
-        form.save()
+        instance=form.save()
+        # 3.项目初始化问题类型
+        issues_type_object_list = []
+        for item in models.IssuesType.PROJECT_INIT_LIST:  # ["任务", '功能', 'Bug']
+            issues_type_object_list.append(models.IssuesType(project=instance, title=item))
+        models.IssuesType.objects.bulk_create(issues_type_object_list)
         return JsonResponse({'status': True})
     return JsonResponse({'status':False,'errors':form.errors})
 

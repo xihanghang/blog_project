@@ -1,0 +1,52 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+
+
+{% block css %}{% endblock %}
+
+
+
+{% block content %}
+      <div class="panel-body">
+          <div class="col-sm-4 title-list">
+            <ul id="catalog">
+                {% for wiki_title in data %}
+                  {% if wiki_title %}
+
+                      <li>{{ wiki_title.title }}</li>
+
+                  {% endif %}
+              {% endfor %}
+
+            </ul>
+          </div>
+          <div class="col-sm-8 content">
+              {% for wiki_object in data %}
+                  {% if wiki_object %}
+                      <div id="previewMarkdown">
+                          <textarea>{{ wiki_object.content }}</textarea>
+                      </div>
+                  {% endif %}
+              {% endfor %}
+      </div>
+{% endblock %}
+
+
+
+{% block js %}
+    <script src="{% static 'plugin/editor-md/editormd.min.js' %}"></script>
+    <script src="{% static 'plugin/editor-md/lib/marked.min.js' %}"></script>
+    <script>
+    var BokeEssay={% url  %}
+        $(function () {
+            initShow();
+        })
+
+        function initShow() {
+            editormd.markdownToHTML("previewMarkdown", {
+                htmlDecode: "style,script,iframe"
+            });
+        }
+    </script>
+
+{% endblock %}
